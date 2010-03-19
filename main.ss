@@ -5,9 +5,15 @@
 
 (define gen-integer
   (λ ()
-    (random 100)))
+    (- 50 (random 100))))
 
 (hash-set! h integer? gen-integer)
+
+(define gen-positive
+  (λ ()
+    (abs (gen-integer))))
+
+(hash-set! h positive? gen-positive)
 
 (define (gen contract)
   (let ([g (hash-ref h contract #f)])
@@ -24,3 +30,4 @@
         (test-gen contract (- attempts 1)))))
 
 (test-gen integer? 10)
+(test-gen positive? 10)
