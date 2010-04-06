@@ -18,8 +18,7 @@
   
   (define (gen-between/c n m)
     (λ ()
-      -5))
-  ;(+ (* (- m n) (random)) n)))
+      (+ (* (- m n) (random)) n)))
   
   (hash-set! h (between/c 0 10) (gen-between/c 0 10))
   
@@ -29,51 +28,49 @@
           g
           (error "Can not generate value for contract ~a" contract))))
   
-  (define (test-gen contract attempts exp)
-    (if (<= attempts 0)
-        #t
-        (begin
-          (check-equal? (exp)
-                        #t)
-          (test-gen contract (- attempts 1) exp))))
+ 
   
-  ;;(test-gen integer? 10 (λ ()
-  ;;                        (integer? ((gen integer?)))))
-  ;;(test-gen positive? 10 (λ ()
-  ;;                         (positive? ((gen positive?)))))
-  
-  (define (test-fun x)
-    #t)
+  (define (test-gen-->0.1)
+    0)
+  (define (test-gen-->0.2 an-integer)
+    0)
+  (define (test-gen-->0.3 an-integer a-positive)
+    0)
+  (define (test-gen-->0.4 a-between/c-0-10)
+    a-between/c-0-10)
   
   (provide/contract
-   [test-fun (-> (between/c 0 10) any)]
    [gen-integer (-> (-> integer?))]
    [gen-positive (-> (-> positive?))]
    [gen-between/c (->d
                    ([n integer?]
                     [m (and/c integer? (>=/c n))]) 
                    ()
-                   [result (-> (between/c n m))])])
+                   [result (-> (between/c n m))])]
+   [test-gen-->0.1 (-> any)]
+   [test-gen-->0.2 (-> integer? any)]
+   [test-gen-->0.3 (-> integer? positive? any)]
+   [test-gen-->0.4 (-> (between/c 0 10) (between/c 0 10))]
+   )
   
-  ((gen-between/c 0 10))
+  (provide gen-->)
   
-  (define (test-gen-s g attempts)
-    (if (<= attempts 0)
-        #t
-        (begin (g)
-               (test-gen-s g (- attempts 1)))))
   
-  (check-equal? (test-gen-s (gen-integer) 100)
-                #t)
   
-  (check-equal? (test-gen-s (gen-positive) 100)
-                #t)
+  (define (gen--> . args)
+    (let ([f-args-c (reverse (rest (reverse args)))]
+          [return-value-c (first (reverse args))])
+      (let ([f-args-gen (map gen f-args-c)])
+        (λ ()
+          ;          (length f-args-gen)))))
+          (map (λ (x)
+                 (apply x (list)))
+               f-args-gen)))))
   
-  (check-equal? (test-gen-s (gen-between/c 0 100) 100)
-                #t)
+  
   
   ;;(test-gen between/c 10 (λ ()
   ;;                         (test-fun ((gen between/c) 0 10))))
   
   
-)
+  )
